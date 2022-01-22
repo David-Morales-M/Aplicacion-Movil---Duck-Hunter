@@ -13,6 +13,8 @@ import androidx.appcompat.app.AlertDialog
 
 
 class MainActivity : AppCompatActivity() {
+
+    // Declaración de las variables
     lateinit var textViewUsuario: TextView
     lateinit var textViewContador: TextView
     lateinit var textViewTiempo: TextView
@@ -21,9 +23,12 @@ class MainActivity : AppCompatActivity() {
     var anchoPantalla = 0
     var alturaPantalla = 0
     var gameOver = false
+
+    // OnCreate
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
         //Inicialización de variables
         textViewUsuario = findViewById(R.id.textViewUsuario)
         textViewContador = findViewById(R.id.textViewContador)
@@ -50,7 +55,7 @@ class MainActivity : AppCompatActivity() {
             Handler().postDelayed(Runnable {
                 imageViewPato.setImageResource(R.drawable.duck)
                 moverPato()
-            }, 500)
+            }, 300)
         }
     }
     private fun inicializarPantalla() {
@@ -72,6 +77,7 @@ class MainActivity : AppCompatActivity() {
         imageViewPato.setX(randomX.toFloat())
         imageViewPato.setY(randomY.toFloat())
     }
+
     private fun inicializarCuentaRegresiva() {
         object : CountDownTimer(60000, 1000) {
             override fun onTick(millisUntilFinished: Long) {
