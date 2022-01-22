@@ -22,9 +22,9 @@ class FileExternalManager(val actividad: Activity): FileHandler{
                     SHAREDINFO_FILENAME
                 )
             ).bufferedWriter().use { outputStream ->
-                outputStream.write("dato1")
+                outputStream.write(datosAGrabar.first)
                 outputStream.write(System.lineSeparator())
-                outputStream.write("dato2")
+                outputStream.write(datosAGrabar.second)
             }
         }
     }
