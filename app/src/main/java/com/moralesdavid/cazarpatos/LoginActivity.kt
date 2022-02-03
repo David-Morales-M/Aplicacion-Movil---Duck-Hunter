@@ -4,9 +4,15 @@ import android.content.Intent
 import android.media.MediaPlayer
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.CheckBox
 import android.widget.EditText
+import android.widget.Toast
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
+
 
 class LoginActivity : AppCompatActivity() {
 
@@ -18,6 +24,7 @@ class LoginActivity : AppCompatActivity() {
     lateinit var buttonNewUser: Button
     lateinit var mediaPlayer: MediaPlayer
     lateinit var checkBoxRecordarme: CheckBox
+    private lateinit var auth: FirebaseAuth
 
     // OnCreate
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -33,6 +40,9 @@ class LoginActivity : AppCompatActivity() {
         buttonNewUser = findViewById(R.id.buttonNewUser)
         checkBoxRecordarme = findViewById(R.id.checkBoxRecordarme)
 
+        // Initialize Firebase Auth
+        auth = Firebase.auth
+
         // Datos de Preferencias
         LeerDatosDePreferencias()
 
@@ -47,15 +57,37 @@ class LoginActivity : AppCompatActivity() {
             GuardarDatosEnPreferencias()
 
             // Si pasa validación de datos requeridos, ir a pantalla principal
-            val intencion = Intent(this, MainActivity::class.java)
-            intencion.putExtra(EXTRA_LOGIN, email)
-            startActivity(intencion)
+            //val intencion = Intent(this, MainActivity::class.java)
+            //intencion.putExtra(EXTRA_LOGIN, email)
+            //startActivity(intencion)
+
+            AutenticarUsuario(email, clave)
         }
         buttonNewUser.setOnClickListener {
 
         }
         mediaPlayer = MediaPlayer.create(this, R.raw.title_screen)
         mediaPlayer.start()
+    }
+
+    fun AutenticarUsuario(email: String, password: String) {
+        auth.signInWithEmailAndPassword(email, password)
+            .addOnCompleteListener(this) { task ->
+                if (task.isSuccessful) {
+                    Log.d(EXTRA_LOGIN, "signInWithEmail:success")
+                    //Si pasa validación de datos requeridos, ir a pantalla principal
+                    val intencion = Intent(this, MainActivity::class.java)
+                    intencion.putExtra(EXTRA_LOGIN, auth.currentUser!!.email)
+                    startActivity(intencion)
+                    //finish()
+                } else {
+                    Log.w(EXTRA_LOGIN, "signInWithEmail:failure", task.exception)
+                    Toast.makeText(
+                        baseContext, task.exception!!.message,
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
     }
 
     private fun ValidarDatosRequeridos(): Boolean {
@@ -84,18 +116,18 @@ class LoginActivity : AppCompatActivity() {
         if (listadoLeido.first != null) {
             checkBoxRecordarme.isChecked = true
         }
-        editTextEmail.setText (listadoLeido.first)
-        editTextPassword.setText (listadoLeido.second)
+        editTextEmail.setText(listadoLeido.first)
+        editTextPassword.setText(listadoLeido.second)
     }
 
-    private fun GuardarDatosEnPreferencias(){
+    private fun GuardarDatosEnPreferencias() {
         val email = editTextEmail.text.toString()
         val clave = editTextPassword.text.toString()
-        val listadoAGrabar:Pair<String,String>
-        if(checkBoxRecordarme.isChecked){
+        val listadoAGrabar: Pair<String, String>
+        if (checkBoxRecordarme.isChecked) {
             listadoAGrabar = email to clave
-        } else{
-            listadoAGrabar ="" to ""
+        } else {
+            listadoAGrabar = "" to ""
         }
         manejadorArchivo.SaveInformation(listadoAGrabar)
     }
@@ -105,4 +137,5 @@ class LoginActivity : AppCompatActivity() {
         super.onDestroy()
     }
 }
+
 
